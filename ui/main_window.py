@@ -14,6 +14,9 @@ class MainWindow(QMainWindow):
 		super().__init__()
 		# Thiết lập kích thước tối thiểu cho cửa sổ chính
 		self.setMinimumSize(MIN_MAINWINDOW_WIDTH, MIN_MAINWINDOW_HEIGHT)
+		# Lưu lại kích thước tối thiểu để popup có thể truy cập nếu cần
+		self.min_width = MIN_MAINWINDOW_WIDTH
+		self.min_height = MIN_MAINWINDOW_HEIGHT
 
 		self.setWindowTitle("Quản lý dữ liệu")
 		# Thiết lập icon ứng dụng, có thể thay đổi động qua APP_ICON_PATH

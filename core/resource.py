@@ -89,13 +89,14 @@ def set_db_path(new_path: str) -> None:
 APP_ICON_PATH: str = resource_path("assets/icons/app_icon.png")
 
 def set_app_icon_path(new_path: str) -> None:
-	"""
-	Cập nhật đường dẫn icon ứng dụng động khi người dùng chọn icon khác.
-	Args:
-		new_path (str): Đường dẫn tuyệt đối hoặc tương đối tới file icon mới
-	"""
-	global APP_ICON_PATH
-	APP_ICON_PATH = new_path
+    """
+    Cập nhật đường dẫn icon ứng dụng động khi người dùng chọn file khác.
+    Args:
+        new_path (str): Đường dẫn tuyệt đối hoặc tương đối tới file icon mới
+    """
+    global APP_ICON_PATH
+    APP_ICON_PATH = new_path
+
 
 # Đường dẫn ảnh trong assets/images
 IMG_ABSENCE_RESTORE = resource_path("assets/images/absence_restore.png")
