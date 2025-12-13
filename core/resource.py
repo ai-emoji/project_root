@@ -5,7 +5,7 @@
 # Biến cấu hình UI (theo .copilot_instructions)
 VERSION = "1.0.0"
 LAST_UPDATE = "2025-12-13"  # Ngày cập nhật cuối cùng
-HEADER_HEIGHT = "120px"
+HEADER_HEIGHT = "140px"
 FOOTER_WEIGHT = "30px"
 MAIN_HEIGHT = "calc(100% - HEADER_HEIGHT - FOOTER_WEIGHT)"
 HEADER_MAIN_1_HEIGHT = "40px"
@@ -49,14 +49,19 @@ TEXT_2_COLOR = "#BF092F"
 TEXT_3_COLOR = "#FFFFFF"
 TEXT_4_COLOR = "#0046FF"
 UI_FONT = "Segoe UI, Inter, Roboto"
-TITLE_FONT = "18px"
+TITLE_FONT = "16px"
 CONTENT_FONT = "13px"
 BUTTON_FONT = "14px"
 TABLE_FONT = "13px"
 ROW_SPACING = "6px"
+FONT_SIZE_ACTIVE = "16px"
 FONT_WEIGHT_NORMAL = 400
 FONT_WEIGHT_BOLD = 600
 FONT_WEIGHT_SEMIBOLD = 500
+FUNCTION_HEDER_WIDTH = 100
+FUNCTION_MAIN_WIDTH = 120
+FUNCTION_MAIN_HEIGHT = 100
+FUNCTION_HEIGHT = "40px"
 
 # =======================================================
 # Đường dẫn icon và ảnh (dùng resource_path)
