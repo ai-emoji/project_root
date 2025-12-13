@@ -1,0 +1,1 @@
+# Widget footer dùng chung

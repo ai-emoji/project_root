@@ -1,0 +1,1 @@
+# Widget header dùng chung
