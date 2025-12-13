@@ -19,76 +19,6 @@ Bạn là lập trình viên Python cấp độ Senior, chuyên về phát tri�
 # Kích thước tối thiểu cho cửa sổ chính:
 MIN_MAINWINDOW_WIDTH = 960
 MIN_MAINWINDOW_HEIGHT = 540
-
-HEADER_HEIGHT = 120px
-MAIN_HEIGHT = calc(100% - HEADER_HEIGHT - FOOTER_WEIGHT)
-FOOTER_WEIGHT = 30px
-HEADER_MAIN_1_HEIGHT = 40px
-HEADER_MAIN_2_HEIGHT = 35px
-HEADER_MAIN_3_HEIGHT = 30px
-HEADER_MAIN_4_HEIGHT = 25px
-MAIN_CONTENT_HEIGHT = calc(100% - HEADER_MAIN_1_HEIGHT - HEADER_MAIN_2_HEIGHT - HEADER_MAIN_3_HEIGHT - HEADER_MAIN_4_HEIGHT)
-
-# Kích thước popup tự động co kéo theo nội dung:
-MIN_POPUP_WIDTH = "auto"
-MIN_POPUP_HEIGHT = "auto"
-
-FUNCTION_WIDTH = 100
-FUNCTION_HEIGHT = "100%"
-
-#padding/margin chung
-COMMON_PADDING = 10px
-COMMON_MARGIN = 10px
-# Padding/margin theo thứ tự: top right bottom left
-COMMON_PADDING_10_0_10_0 = "10px 0px 10px 0px"
-COMMON_MARGIN_10_0_10_0 = "10px 0px 10px 0px"
-
-#kích thước row table
-TABLE_ROW_HEIGHT = 30px
-
-#kích thước title bar
-TITLEBAR_HEIGHT = 40px
-
-#kích thước title trong popup
-POPUP_TITLE_FONT_SIZE = 18px
-
-#kích thước chiều cao bg title trong popup
-POPUP_1_TITLE_BG_HEIGHT = 40px
-POPUP_2_TITLE_BG_HEIGHT = 50px
-
-
-# Màu sắc:
-HEADER_BG_COLOR = "#FFFFFF"
-MAIN_BG_COLOR = "#FFFFFF"
-FOOTER_BG_COLOR = "#a7a9ac"
-HEADER_1_BG_COLOR = "#C9B59C"
-HEADER_2_BG_COLOR = "#D9CFC7"
-HEADER_3_BG_COLOR = "#EFE9E3"
-HEADER_4_BG_COLOR = "#F9F8F6"
-BOTTOM_BORDER_COLOR = "#a7a9ac"
-# màu sắc title
-TITLE_1_COLOR = "#5AB2FF"
-TITLE_2_COLOR = "#A0DEFF"
-TITLE_3_COLOR = "#CAF4FF"
-TITLE_4_COLOR = "#939598"
-TITLE_5_COLOR = "#e6e7e8"
-
-# màu sắc button
-BUTTON_1_COLOR = "#0046FF"
-BUTTON_2_COLOR = "#DCDCDC"
-
-#màu sách disabled
-BUTTON_1_DISABLED_COLOR = "#a7a9ac"
-
-#màu sách hover
-BUTTON_1_HOVER_COLOR = "#0046FF"
-BUTTON_2_HOVER_COLOR = "#8CA9FF"
-# màu sắc text
-TEXT_1_COLOR = "#000000"
-TEXT_2_COLOR = "#BF092F"
-TEXT_3_COLOR = "#FFFFFF"
-TEXT_4_COLOR = "#0046FF"
-
 # Font:
 UI_FONT = "Segoe UI, Inter, Roboto"
 TITLE_FONT = 18px
@@ -100,8 +30,6 @@ ROW_SPACING = 6px
 FONT_WEIGHT_NORMAL = 400
 FONT_WEIGHT_BOLD = 600
 FONT_WEIGHT_SEMIBOLD = 500
-
-
 #icon:
 - Chiều cao (H) của icon cố định, ví dụ: 24 px, 32 px.
 - Chiều rộng (W) tự động theo tỉ lệ gốc của ảnh.
@@ -189,18 +117,15 @@ project_root/
 │   └── widgets_footer.py   # Widget footer dùng chung
 │
 ├── ui/
-│   ├── main_window.py      # Giao diện chính, quản lý signal/slot, gọi service
-│   ├── widgets_<modules>.py # Các widget UI cho từng module chức năng
-│   └── popup_<modules>.py  # Các widget UI cho từng module chức năng
+│   └──  main_window.py      # Giao diện chính, quản lý signal/slot, gọi service
 │
 ├── assets/
 │   ├── icons/              # Icon PNG/SVG dùng cho UI
 │   └── images/             # Ảnh minh họa, background, v.v.
 └── data/
-    └── app.db              # File database SQLite
-    └── creater_<modules>.py # Tạo bảng SQLite cho từng module chức năng
+└── app.db              # File database SQLite
+└── creater_<modules>.py # Tạo bảng SQLite cho từng module chức năng
  = ======================================================
-
  = == TÓM TẮT LUỒNG CHẠY ===
 UI (main_window.py)
 ↓ gọi hàm
@@ -283,5 +208,6 @@ UI layer:
 ⭐ Hoàn toàn không lỗi khi build EXE
 → Luôn trả lời bằng **TIẾNG VIỆT**.
 → Bắt đầu tạo code theo TẤT CẢ quy tắc trên.
-hãy đọc dõ .copilot_instructions
+hãy đọc dõ .copilot_instructions và sử dụng biến trong resource.py
 self.table.setFocusPolicy(Qt.NoFocus) # Ngăn không border xuất hiện khi chọn hàng
+self.table.setSelectionBehavior(QAbstractItemView.SelectRows) # Chọn cả hàng

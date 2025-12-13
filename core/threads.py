@@ -1,46 +1,48 @@
-"""
-Mô tả:
-        Cung cấp các lớp/hàm hỗ trợ chạy đa luồng, xử lý tác vụ nền an toàn với PySide6.
-        Đảm bảo không update UI trực tiếp từ thread nền, chỉ emit signal về UI thread.
-"""
-
-from PySide6.QtCore import QThread, Signal, QObject
-
+# Các lớp/hàm hỗ trợ chạy đa luồng, xử lý tác vụ nền an toàn
+from PySide6.QtCore import QObject, Signal, QRunnable, QThreadPool, QThread
+import traceback
 
 class WorkerSignals(QObject):
-    """
-    Mô tả: Định nghĩa các signal cho worker thread.
-    """
+	"""
+	Tín hiệu cho worker thread: trả về kết quả, lỗi, trạng thái hoàn thành.
+	"""
+	finished = Signal()
+	error = Signal(str)
+	result = Signal(object)
 
-    finished = Signal()
-    error = Signal(str)
-    result = Signal(object)
+class Worker(QRunnable):
+	"""
+	Worker chạy tác vụ nền trong QThreadPool.
+	Args:
+		fn (callable): Hàm cần thực thi
+		*args, **kwargs: Tham số cho hàm
+	"""
+	def __init__(self, fn, *args, **kwargs):
+		super().__init__()
+		self.fn = fn
+		self.args = args
+		self.kwargs = kwargs
+		self.signals = WorkerSignals()
 
+	def run(self):
+		try:
+			result = self.fn(*self.args, **self.kwargs)
+			self.signals.result.emit(result)
+		except Exception as e:
+			tb = traceback.format_exc()
+			self.signals.error.emit(tb)
+		finally:
+			self.signals.finished.emit()
 
-class DatabaseWorker(QThread):
-    """
-    Mô tả: QThread chạy truy vấn database nặng ở background, trả kết quả qua signal.
-    Args:
-            func (callable): Hàm thực thi tác vụ nền.
-            *args, **kwargs: Tham số truyền vào hàm.
-    Signals:
-            result(object): Kết quả trả về.
-            error(str): Lỗi nếu có.
-            finished(): Kết thúc tác vụ.
-    """
-
-    def __init__(self, func, *args, **kwargs):
-        super().__init__()
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-        self.signals = WorkerSignals()
-
-    def run(self):
-        try:
-            res = self.func(*self.args, **self.kwargs)
-            self.signals.result.emit(res)
-        except Exception as e:
-            self.signals.error.emit(str(e))
-        finally:
-            self.signals.finished.emit()
+def run_in_threadpool(fn, *args, **kwargs):
+	"""
+	Hàm tiện ích để chạy hàm trong QThreadPool.
+	Args:
+		fn (callable): Hàm cần thực thi
+		*args, **kwargs: Tham số cho hàm
+	Returns:
+		Worker: Đối tượng worker đã submit vào threadpool
+	"""
+	worker = Worker(fn, *args, **kwargs)
+	QThreadPool.globalInstance().start(worker)
+	return worker

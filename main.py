@@ -1,27 +1,15 @@
-"""
-Mô tả:
-        Điểm khởi động ứng dụng PySide6, thiết lập icon, khởi tạo MainWindow.
-"""
+# File main.py
+# Điểm khởi động ứng dụng
 
 from PySide6.QtWidgets import QApplication
-from PySide6.QtGui import QIcon
-import sys
-from core.resource import get_app_icon
 from ui.main_window import MainWindow
-
-
-def main() -> None:
-    """
-    Mô tả: Hàm main khởi động ứng dụng.
-    Returns:
-            None
-    """
-    app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(get_app_icon()))
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
-
+import sys
 
 if __name__ == "__main__":
-    main()
+	# Khởi tạo ứng dụng PySide6
+	app = QApplication(sys.argv)
+	# Tạo cửa sổ chính
+	window = MainWindow()
+	window.show()
+	# Chạy vòng lặp sự kiện
+	sys.exit(app.exec())

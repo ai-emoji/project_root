@@ -1,7 +1,7 @@
 # Repository thao tác dữ liệu bảng company
 # Tuân thủ Clean Architecture, comment tiếng Việt
 import sqlite3
-from core.resource import APP_DB_PATH
+from core.resource import DB_PATH
 
 
 def get_company():
@@ -9,7 +9,7 @@ def get_company():
     Lấy thông tin công ty (bản ghi đầu tiên).
     Returns: dict hoặc None
     """
-    with sqlite3.connect(APP_DB_PATH) as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, name, address, phone, tax_code, image_path FROM company LIMIT 1"
@@ -31,7 +31,7 @@ def upsert_company(name, address, phone, tax_code, image_path):
     """
     Cập nhật hoặc thêm mới thông tin công ty (chỉ 1 bản ghi duy nhất).
     """
-    with sqlite3.connect(APP_DB_PATH) as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         # Kiểm tra đã có bản ghi chưa
         cursor.execute("SELECT id FROM company LIMIT 1")

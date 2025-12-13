@@ -1,300 +1,270 @@
-from functools import partial
-
-"""
-Mô tả:
-    Widget header dùng chung, chia 2 phần: header (HEADER_MAIN_1_HEIGHT, có border dưới), main (MAIN_CONTENT_HEIGHT), tách bg và nội dung.
-"""
-
-from PySide6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QLabel,
-    QFrame,
-    QPushButton,
-    QStackedWidget,
-)
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QSpacerItem, QSizePolicy, QApplication
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
 from core.resource import (
-    HEADER_MAIN_1_HEIGHT,
-    MAIN_CONTENT_HEIGHT,
-    BOTTOM_BORDER_COLOR,
-    HEADER_BG_COLOR,
-    UI_FONT,
-    FUNCTION_HEDER_WIDTH,
-    TEXT_1_COLOR,
-    FONT_WEIGHT_SEMIBOLD,
-    FONT_WEIGHT_BOLD,
-    FONT_SIZE_ACTIVE,
-    FUNCTION_MAIN_HEIGHT,
-    FUNCTION_MAIN_WIDTH,
-    IMAGES,
+    COLOR_1_TEXT, HEADER_HEIGHT, HEADER_BG, COLOR_TEXT, FONT_BOLD, 
+    WIDGETS_HEADER_HEIGHT, WIDGETS_MAIN_HEIGHT, WIDTH_FUNCTION_HEADER, 
+    HEIGHT_FUNCTION_HEADER, WIDGETS_HEADER_WIDTH, HOVER_COLOR,
+    IMG_COMPANY, IMG_JOB_TITLE, IMG_DEPARTMENT, IMG_EMPLOYEE, IMG_HOLIDAY, 
+    IMG_PASSWORD, IMG_EXIT, IMG_DEVICE, IMG_DOWNLOAD_ATTENDANCE, 
+    IMG_DOWNLOAD_STAFF, IMG_UPLOAD_STAFF, IMG_ARRANGE_SCHEDULE, 
+    IMG_ATTENDANCE_SYMBOL, IMG_ABSENCE_SYMBOL, IMG_WEEKEND, 
+    IMG_BACKUP, IMG_ABSENCE_RESTORE
 )
-
-from PySide6.QtGui import QIcon
-
 
 class HeaderWidget(QWidget):
     """
-    Mô tả: Header chia 2 phần: header (HEADER_MAIN_1_HEIGHT, có border dưới), main (MAIN_CONTENT_HEIGHT), tách bg và nội dung.
+    Widget header dùng chung cho toàn bộ ứng dụng.
+    Chia làm 2 phần: phần trên (WIDGETS_HEADER_HEIGHT) và phần dưới (WIDGETS_MAIN_HEIGHT).
+    Tách riêng background và nội dung.
     """
-
-    def _show_company_popup(self):
-        from ui.popup_company import PopupCompany
-
-        parent = self.window() if hasattr(self, "window") else self
-        # Giữ reference để tránh bị GC
-        self._popup_company_ref = PopupCompany(parent)
-        self._popup_company_ref.setWindowModality(Qt.ApplicationModal)
-        # Cho phép chuyển đổi giữa exec/show để debug
-        USE_EXEC = False  # Đổi sang False để thử show() nếu exec() không hiển thị
-        if USE_EXEC:
-            result = self._popup_company_ref.exec()
-        else:
-            self._popup_company_ref.show()
-
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self._init_ui()
-
-    def _init_ui(self) -> None:
-        """
-        Mô tả: Khởi tạo layout header chia 2 phần, tách bg và nội dung.
-        Returns:
-            None
-        """
-        # Layout tổng
+        # Thiết lập kích thước cố định cho header tổng
+        self.setFixedHeight(HEADER_HEIGHT)
+        # Không setFixedWidth để header tự co giãn theo cửa sổ chính
+        
+        # Layout dọc cho 2 phần
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
-
-        # Phần header (HEADER_MAIN_1_HEIGHT, có border dưới)
-        self.header_bg = QFrame(self)
-        self.header_bg.setFixedHeight(int(HEADER_MAIN_1_HEIGHT.replace("px", "")))
-        self.header_bg.setStyleSheet(
-            f"background-color: {HEADER_BG_COLOR}; border-bottom: 1px solid {BOTTOM_BORDER_COLOR};"
-        )
-        header_layout = QHBoxLayout(self.header_bg)
-        header_layout.setContentsMargins(0, 0, 10, 0)
-        header_layout.setSpacing(10)
-
-        # Widget chứa 4 phím chức năng, sát trái, trên nền bg
-        self.button_bar = QWidget(self.header_bg)
-        button_bar_layout = QHBoxLayout(self.button_bar)
-        button_bar_layout.setContentsMargins(0, 0, 0, 0)
-        button_bar_layout.setSpacing(0)
-
-        # Đảm bảo FUNCTION_HEDER_WIDTH là chuỗi px
-        width_px = (
-            f"{FUNCTION_HEDER_WIDTH}px"
-            if isinstance(FUNCTION_HEDER_WIDTH, int)
-            else FUNCTION_HEDER_WIDTH
-        )
-        from core.resource import BUTTON_1_HOVER_COLOR, TEXT_3_COLOR
-
-        button_style = (
-            f"min-width: {width_px}; max-width: {width_px}; min-height: {HEADER_MAIN_1_HEIGHT}; max-height: {HEADER_MAIN_1_HEIGHT}; "
-            f"color: {TEXT_1_COLOR}; font-family: {UI_FONT}; font-weight: {FONT_WEIGHT_SEMIBOLD}; border-radius: 0px; background: transparent;"
-        )
-
-        # Set QSS cho toàn bộ button_bar để enable hover/active đúng chuẩn Qt
-        self.button_bar.setStyleSheet(
-            f"QPushButton {{ {button_style} }}"
-            f"QPushButton:hover, QPushButton:checked {{ background: {BUTTON_1_HOVER_COLOR}; color: {TEXT_3_COLOR}; font-weight: {FONT_WEIGHT_BOLD}; font-size: {FONT_SIZE_ACTIVE}; }}"
-        )
-
-        def create_text_button(text, tooltip, hover_active=True):
-            btn = QPushButton(text)
-            btn.setToolTip(tooltip)
+        
+        # Phần trên: Header nhỏ (4 nút chức năng chính)
+        top_container = QWidget(self)
+        top_container_layout = QVBoxLayout(top_container)
+        top_container_layout.setContentsMargins(0, 0, 0, 0)
+        top_container_layout.setSpacing(0)
+        
+        self.header_top = QWidget()
+        self.header_top.setFixedHeight(WIDGETS_HEADER_HEIGHT)
+        self.header_top.setStyleSheet(f"background: {HEADER_BG};")
+        top_layout = QHBoxLayout(self.header_top)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(0)
+        
+        # 4 phím chức năng bên trái: Khai báo, Kết nối, Chấm công, Công cụ
+        button_names = ["Khai báo", "Kết nối", "Chấm công", "Công cụ"]
+        button_keys = ["khai_bao", "ket_noi", "cham_cong", "cong_cu"]
+        self.function_buttons = []
+        self.active_button_key = None
+        
+        for idx, (name, key) in enumerate(zip(button_names, button_keys)):
+            btn = QPushButton(name)
+            btn.setFixedSize(WIDTH_FUNCTION_HEADER, HEIGHT_FUNCTION_HEADER)
             btn.setCursor(Qt.PointingHandCursor)
-            btn.setCheckable(hover_active)
-            return btn
-
-        self.btn_khaibao = create_text_button("Khai báo", "Khai báo", True)
-        self.btn_ketnoi = create_text_button("Kết nối", "Kết nối", True)
-        self.btn_chamcong = create_text_button("Chấm công", "Chấm công", True)
-        self.btn_congcu = create_text_button("Công cụ", "Công cụ", True)
-
-        button_bar_layout.addWidget(self.btn_khaibao)
-        button_bar_layout.addWidget(self.btn_ketnoi)
-        button_bar_layout.addWidget(self.btn_chamcong)
-        button_bar_layout.addWidget(self.btn_congcu)
-
-        # Đảm bảo chỉ 1 button được checked cùng lúc
-        self._button_group = [
-            self.btn_khaibao,
-            self.btn_ketnoi,
-            self.btn_chamcong,
-            self.btn_congcu,
-        ]
-
-        def make_exclusive(btn, others):
-            def handler():
-                if btn.isChecked():
-                    for b in others:
-                        b.setChecked(False)
-
-            return handler
-
-        for i, btn in enumerate(self._button_group):
-            others = self._button_group[:i] + self._button_group[i + 1 :]
-            btn.clicked.connect(make_exclusive(btn, others))
-
-        header_layout.addWidget(self.button_bar, 0, Qt.AlignLeft)
-
-        # Phần main (MAIN_CONTENT_HEIGHT)
-
-        # Tạo QFrame làm nền có border-bottom
-        self.main_content_bg = QFrame(self)
-        if MAIN_CONTENT_HEIGHT.endswith("px"):
-            self.main_content_bg.setFixedHeight(
-                int(MAIN_CONTENT_HEIGHT.replace("px", ""))
+            btn.setProperty("button_key", key)
+            
+            # Style mặc định + hover + active
+            btn.setStyleSheet(
+                f"QPushButton {{ font-weight: {FONT_BOLD}; color: {COLOR_TEXT}; background: transparent; border: none; }}"
+                f"QPushButton:hover {{ background: {HOVER_COLOR}; color: {COLOR_1_TEXT}; }}"
+                f"QPushButton[active='true'] {{ background: {HOVER_COLOR}; color: {COLOR_1_TEXT}; }}"
             )
-        self.main_content_bg.setStyleSheet(
-            f"background-color: {HEADER_BG_COLOR}; border-bottom: 1px solid {BOTTOM_BORDER_COLOR};"
-        )
-        main_content_bg_layout = QVBoxLayout(self.main_content_bg)
-        main_content_bg_layout.setContentsMargins(0, 0, 0, 0)
-        main_content_bg_layout.setSpacing(0)
-
-        # QFrame chứa nội dung thực sự, không border
-        self.main_content = QFrame(self.main_content_bg)
-        self.main_content.setStyleSheet("background: transparent; border: none;")
-        main_content_layout = QHBoxLayout(self.main_content)
-        main_content_layout.setContentsMargins(0, 0, 0, 0)
-        main_content_layout.setSpacing(8)
-
-        # Định nghĩa các nhóm chức năng cho từng tab header
-        # Định nghĩa các nhóm chức năng cho từng tab header, tránh lặp lại tooltip nếu giống text
+            
+            # Kết nối sự kiện click
+            btn.clicked.connect(lambda checked, k=key: self._on_function_button_clicked(k))
+            
+            top_layout.addWidget(btn)
+            self.function_buttons.append(btn)
+        
+        # Spacer để đẩy các phím chức năng sang trái
+        top_layout.addSpacerItem(QSpacerItem(20, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        
+        # Border line cho phần trên
+        top_border = QWidget()
+        top_border.setFixedHeight(1)
+        top_border.setStyleSheet("background: #444;")
+        
+        top_container_layout.addWidget(self.header_top)
+        top_container_layout.addWidget(top_border)
+        main_layout.addWidget(top_container)
+        
+        # Phần dưới: Header main (hiển thị các nút chức năng chi tiết)
+        bottom_container = QWidget(self)
+        bottom_container_layout = QVBoxLayout(bottom_container)
+        bottom_container_layout.setContentsMargins(0, 0, 0, 0)
+        bottom_container_layout.setSpacing(0)
+        
+        self.header_bottom = QWidget()
+        self.header_bottom.setFixedHeight(WIDGETS_MAIN_HEIGHT)
+        self.header_bottom.setStyleSheet(f"background: transparent;")
+        self.bottom_layout = QHBoxLayout(self.header_bottom)
+        self.bottom_layout.setContentsMargins(0, 0, 0, 0)
+        self.bottom_layout.setSpacing(0)
+        self.bottom_layout.addStretch()
+        
+        # Border line cho phần dưới
+        bottom_border = QWidget()
+        bottom_border.setFixedHeight(1)
+        bottom_border.setStyleSheet("background: #444;")
+        
+        bottom_container_layout.addWidget(self.header_bottom)
+        bottom_container_layout.addWidget(bottom_border)
+        main_layout.addWidget(bottom_container)
+        
+        # Hiển thị nhóm đầu tiên mặc định
+        self._on_function_button_clicked("khai_bao")
+    
+    def _on_function_button_clicked(self, button_key):
+        """Xử lý khi click vào một trong 4 nút chức năng chính"""
+        # Cập nhật trạng thái active cho các nút
+        for btn in self.function_buttons:
+            if btn.property("button_key") == button_key:
+                btn.setProperty("active", "true")
+            else:
+                btn.setProperty("active", "false")
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+        
+        self.active_button_key = button_key
+        
+        # Xóa các nút cũ trong phần dưới
+        self._clear_bottom_layout()
+        
+        # Hiển thị nhóm nút tương ứng
+        if button_key in self._main_button_groups:
+            self._display_button_group(button_key)
+    
+    def _clear_bottom_layout(self):
+        """Xóa tất cả widget trong bottom layout"""
+        while self.bottom_layout.count():
+            item = self.bottom_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+            elif item.spacerItem():
+                pass
+            
+        # Hàm tạo tuple (text, tooltip)
         def btn(text, tooltip=None):
-            return (text, tooltip or text)
-
+            return (text, tooltip if tooltip else text)
+        
+        # Khai báo các nhóm nút chức năng cho phần dưới
         self._main_button_groups = {
             "khai_bao": [
-                ("company", *btn("Thông tin công ty")),
-                ("job_title", *btn("Khai báo chức danh")),
-                ("department", *btn("Khai báo phòng ban")),
-                ("employee", *btn("Thông tin nhân viên")),
-                ("holiday", *btn("Khai báo ngày lễ")),
-                ("password", *btn("Đổi mật khẩu")),
-                ("exit", *btn("Thoát ứng dụng")),
+                ("company", IMG_COMPANY, *btn("Thông tin công ty")),
+                ("job_title", IMG_JOB_TITLE, *btn("Khai báo chức danh")),
+                ("department", IMG_DEPARTMENT, *btn("Khai báo phòng ban")),
+                ("employee", IMG_EMPLOYEE, *btn("Thông tin nhân viên")),
+                ("holiday", IMG_HOLIDAY, *btn("Khai báo ngày lễ")),
+                ("password", IMG_PASSWORD, *btn("Đổi mật khẩu", "Đổi mật khẩu đăng nhập")),
+                ("exit", IMG_EXIT, *btn("Thoát ứng dụng")),
             ],
             "ket_noi": [
-                ("device", *btn("Máy chấm công")),
-                ("download_attendance", *btn("Tải máy chấm công")),
-                ("download_staff", *btn("Tải nhân viên về máy tính")),
-                ("upload_staff", *btn("Tải nhân viên lên máy chấm công")),
+                ("device", IMG_DEVICE, *btn("Máy chấm công", "Quản lý máy chấm công")),
+                ("download_attendance", IMG_DOWNLOAD_ATTENDANCE, *btn("Tải máy chấm công", "Tải dữ liệu từ máy chấm công")),
+                ("download_staff", IMG_DOWNLOAD_STAFF, *btn("Tải nhân viên về máy tính", "Tải nhân viên từ máy chấm công về máy tính")),
+                ("upload_staff", IMG_UPLOAD_STAFF, *btn("Tải nhân viên lên máy chấm công")),
             ],
             "cham_cong": [
-                ("arrange_schedule", *btn("Sắp xếp lịch làm việc")),
-                ("attendance_symbol", *btn("Các ký hiệu chấm công")),
-                ("absence_symbol", *btn("Ký hiệu các loại vắng")),
-                ("weekend", *btn("Chọn ngày cuối tuần")),
+                ("arrange_schedule", IMG_ARRANGE_SCHEDULE, *btn("Sắp xếp lịch làm việc")),
+                ("attendance_symbol", IMG_ATTENDANCE_SYMBOL, *btn("Các ký hiệu chấm công")),
+                ("absence_symbol", IMG_ABSENCE_SYMBOL, *btn("Ký hiệu các loại vắng")),
+                ("weekend", IMG_WEEKEND, *btn("Chọn ngày cuối tuần")),
             ],
             "cong_cu": [
-                ("backup", *btn("Sao lưu dữ liệu")),
-                ("absence_restore", *btn("Khôi phục dữ liệu")),
+                ("backup", IMG_BACKUP, *btn("Sao lưu dữ liệu")),
+                ("absence_restore", IMG_ABSENCE_RESTORE, *btn("Khôi phục dữ liệu")),
             ],
         }
-
-        def create_main_button(icon_key, text, tooltip):
-            btn = QPushButton()
-            # Không setToolTip để không có chú thích khi hover
-            btn.setMinimumWidth(FUNCTION_MAIN_WIDTH)
-            btn.setMaximumWidth(FUNCTION_MAIN_WIDTH)
-            btn.setMinimumHeight(FUNCTION_MAIN_HEIGHT)
-            btn.setMaximumHeight(FUNCTION_MAIN_HEIGHT)
-            btn.setStyleSheet(
-                f"QPushButton {{"
-                f"  color: {TEXT_1_COLOR}; font-family: {UI_FONT}; font-weight: {FONT_WEIGHT_SEMIBOLD}; background: transparent; border-radius: 12px;"
-                f"  text-align: center;"
-                f"}}"
-                f"QPushButton:hover {{ background: {BUTTON_1_HOVER_COLOR}; color: {TEXT_3_COLOR}; border-radius: 0px; }}"
+        
+    def _display_button_group(self, group_key):
+        """Hiển thị nhóm nút chức năng trong phần dưới"""
+        buttons_data = self._main_button_groups[group_key]
+        
+        for btn_data in buttons_data:
+            btn_id, img_path, text, tooltip = btn_data
+            
+            # Tạo widget container cho mỗi nút
+            btn_container = QWidget()
+            btn_container.setFixedSize(100, 110)
+            btn_container.setCursor(Qt.PointingHandCursor)
+            btn_container.setToolTip(tooltip)
+            btn_container.setStyleSheet(
+                f"QWidget {{ background: transparent; }}"
+                f"QWidget:hover {{ background: {HOVER_COLOR}; }}"
             )
-            btn.setCursor(Qt.PointingHandCursor)
-
-            # Tạo widget dọc: icon trên, text dưới với chiều cao cố định
-            from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget
-
-            vlayout = QVBoxLayout(btn)
-            vlayout.setContentsMargins(0, 12, 0, 8)
-            vlayout.setSpacing(4)
-
-            # Container cho icon với chiều cao cố định
+            btn_container.setProperty("btn_id", btn_id)
+            
+            # Kết nối sự kiện click cho tất cả nút
+            btn_container.mousePressEvent = lambda event, bid=btn_id: self._on_button_clicked(bid)
+            
+            # Layout dọc cho icon và text
+            btn_layout = QVBoxLayout(btn_container)
+            btn_layout.setContentsMargins(0, 20, 0, 10)
+            btn_layout.setSpacing(5)
+            btn_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+            
+            # Icon - container cố định
             icon_container = QWidget()
-            icon_container.setFixedHeight(43)  # tăng chiều cao icon
+            icon_container.setFixedHeight(45)
+            icon_container.setStyleSheet("background: transparent;")
             icon_layout = QVBoxLayout(icon_container)
             icon_layout.setContentsMargins(0, 0, 0, 0)
+            icon_layout.setSpacing(0)
             icon_layout.setAlignment(Qt.AlignCenter)
-
+            
             icon_label = QLabel()
-            icon_label.setPixmap(
-                QIcon(IMAGES.get(icon_key, "")).pixmap(36, 36)
-            )  # tăng icon
-            icon_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            pixmap = QPixmap(img_path)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                icon_label.setPixmap(scaled_pixmap)
+            icon_label.setAlignment(Qt.AlignCenter)
+            icon_label.setStyleSheet("background: transparent;")
             icon_layout.addWidget(icon_label)
-
-            # Container cho text với chiều cao cố định
+            
+            btn_layout.addWidget(icon_container)
+            
+            # Text container - cố định chiều cao và căn text từ trên xuống
             text_container = QWidget()
-            text_container.setFixedHeight(40)  # tăng chiều cao text
+            text_container.setFixedSize(90, 45)
+            text_container.setStyleSheet("background: transparent;")
             text_layout = QVBoxLayout(text_container)
-            text_layout.setContentsMargins(0, 2, 0, 2)  # thêm padding trên/dưới
+            text_layout.setContentsMargins(0, 0, 0, 0)
+            text_layout.setSpacing(0)
             text_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-
+            
             text_label = QLabel(text)
-            text_label.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+            text_label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
             text_label.setWordWrap(True)
-            text_label.setFixedWidth(110)
-            text_label.setStyleSheet(
-                f"color: {TEXT_1_COLOR}; font-family: {UI_FONT}; font-weight: {FONT_WEIGHT_SEMIBOLD}; font-size: 13px; background: transparent;"
-            )
+            text_label.setStyleSheet(f"""
+                QLabel {{
+                    color: {COLOR_TEXT}; 
+                    font-size: 11px; 
+                    background: transparent;
+                    qproperty-alignment: 'AlignTop | AlignHCenter';
+                }}
+            """)
+            text_label.setFixedWidth(90)
             text_layout.addWidget(text_label)
-
-            vlayout.addWidget(icon_container, alignment=Qt.AlignHCenter)
-            vlayout.addWidget(text_container, alignment=Qt.AlignHCenter)
-            vlayout.setSpacing(6)  # tăng spacing giữa icon và text
-            vlayout.addStretch(1)
-
-            return btn
-
-        # Tạo QStackedWidget để chuyển đổi nhóm chức năng
-        self.stacked_main = QStackedWidget(self.main_content)
-        self._main_pages = {}
-        from PySide6.QtWidgets import QApplication
-
-        for key, btns in self._main_button_groups.items():
-            page = QWidget()
-            layout = QHBoxLayout(page)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.setSpacing(8)
-            layout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            for icon_key, text, tooltip in btns:
-                btn = create_main_button(icon_key, text, tooltip)
-                if icon_key == "exit":
-                    btn.clicked.connect(QApplication.quit)
-                elif icon_key == "company":
-                    btn.clicked.connect(partial(HeaderWidget._show_company_popup, self))
-                layout.addWidget(btn)
-            layout.addStretch(1)
-            self.stacked_main.addWidget(page)
-            self._main_pages[key] = page
-        main_content_layout.addWidget(self.stacked_main)
-        main_content_layout.addStretch(1)
-        main_content_bg_layout.addWidget(self.main_content)
-
-        # Hàm chuyển trang chức năng
-        def show_main_group(key):
-            idx = list(self._main_pages.keys()).index(key)
-            self.stacked_main.setCurrentIndex(idx)
-
-        # Gán sự kiện cho các nút header
-        self.btn_khaibao.clicked.connect(lambda: show_main_group("khai_bao"))
-        self.btn_ketnoi.clicked.connect(lambda: show_main_group("ket_noi"))
-        self.btn_chamcong.clicked.connect(lambda: show_main_group("cham_cong"))
-        self.btn_congcu.clicked.connect(lambda: show_main_group("cong_cu"))
-
-        # Hiển thị mặc định nhóm khai báo
-        show_main_group("khai_bao")
-
-        main_layout.addWidget(self.header_bg)
-        main_layout.addWidget(self.main_content_bg)
+            text_layout.addStretch()
+            
+            btn_layout.addWidget(text_container)
+            
+            self.bottom_layout.addWidget(btn_container)
+        
+        # Thêm spacer cuối
+        self.bottom_layout.addStretch()
+    
+    def _on_button_clicked(self, btn_id):
+        """Xử lý khi click vào các nút trong phần dưới"""
+        if btn_id == "exit":
+            QApplication.quit()
+        elif btn_id == "company":
+            try:
+                from ui.popup_company import PopupCompany
+            except ImportError:
+                return
+            parent_window = self.window()
+            popup = PopupCompany(parent=parent_window)
+            # Đặt popup ra giữa cửa sổ chính
+            if parent_window:
+                geo = parent_window.geometry()
+                popup.move(
+                    geo.x() + (geo.width() - popup.width()) // 2,
+                    geo.y() + (geo.height() - popup.height()) // 2
+                )
+            popup.exec()
+    
+    def resizeEvent(self, event):
+        """Không cần xử lý bg vì đã chia widget riêng biệt"""
+        super().resizeEvent(event)
