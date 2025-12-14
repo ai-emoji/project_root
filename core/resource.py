@@ -11,16 +11,27 @@ MAIN_HEIGHT: int = 370
 FOOTER_HEIGHT: int = 30
 
 
-#wedget header
-WIDGETS_HEADER_WIDTH : int = 960
+# wedget header
+WIDGETS_HEADER_WIDTH: int = 960
 WIDGETS_HEADER_HEIGHT: int = 30
 WIDGETS_MAIN_HEIGHT: int = 110
 WIDGETS_HEADER_BG: str = "#EEEEEE"
 WIDGETS_MAIN_BG: str = "#EEEEEE"
-WIDTH_FUNCTION_HEADER : int = 100
-HEIGHT_FUNCTION_HEADER : int = 30
-WIDTH_FUNCTION_MAIN : int = 100
-HEIGHT_FUNCTION_MAIN : int = 110
+WIDTH_FUNCTION_HEADER: int = 100
+HEIGHT_FUNCTION_HEADER: int = 30
+WIDTH_FUNCTION_MAIN: int = 100
+HEIGHT_FUNCTION_MAIN: int = 110
+
+# wedget job title
+JOB_TITLE_MIN_WIDTH: int = 960
+JOB_TITLE_MIN_HEIGHT: int = 370
+JOB_TITLE_MIN_HEIGHT_1: int = 40
+JOB_TITLE_MIN_HEIGHT_2: int = 40
+JOB_TITLE_MIN_HEIGHT_3: int = 290
+JOB_TITLE_BG_1: str = "#FFFFFF"
+JOB_TITLE_BG_2: str = "#F5F5F5"
+JOB_TITLE_BG_3: str = "#FFFFFF"
+
 
 # Font
 UI_FONT: str = "Segoe UI, Inter, Roboto"
@@ -51,19 +62,21 @@ ACTIVE_COLOR: str = "#1976D2"
 import os
 import sys
 
+
 def resource_path(relative_path: str) -> str:
-	"""
-	Lấy đường dẫn tuyệt đối đến tài nguyên (icon, ảnh, db,...) tương thích khi build exe.
-	Args:
-		relative_path (str): Đường dẫn tương đối đến file tài nguyên
-	Returns:
-		str: Đường dẫn tuyệt đối
-	"""
-	try:
-		base_path = sys._MEIPASS
-	except AttributeError:
-		base_path = os.path.abspath(".")
-	return os.path.join(base_path, relative_path)
+    """
+    Lấy đường dẫn tuyệt đối đến tài nguyên (icon, ảnh, db,...) tương thích khi build exe.
+    Args:
+            relative_path (str): Đường dẫn tương đối đến file tài nguyên
+    Returns:
+            str: Đường dẫn tuyệt đối
+    """
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 
 # Đường dẫn mẫu
 ICON_PATH: str = resource_path("assets/icons/")
@@ -74,19 +87,22 @@ IMAGE_PATH: str = resource_path("assets/images/")
 # Đường dẫn database, cho phép thay đổi khi người dùng cập nhật
 DB_PATH: str = resource_path("data/app.db")
 
+
 def set_db_path(new_path: str) -> None:
-	"""
-	Cập nhật đường dẫn database động khi người dùng chọn file khác.
-	Args:
-		new_path (str): Đường dẫn tuyệt đối hoặc tương đối tới file database mới
-	"""
-	global DB_PATH
-	DB_PATH = new_path
+    """
+    Cập nhật đường dẫn database động khi người dùng chọn file khác.
+    Args:
+            new_path (str): Đường dẫn tuyệt đối hoặc tương đối tới file database mới
+    """
+    global DB_PATH
+    DB_PATH = new_path
+
 
 # Đường dẫn icon ứng dụng, cho phép thay đổi khi người dùng cập nhật
 
 # Đường dẫn icon ứng dụng, cho phép thay đổi khi người dùng cập nhật
 APP_ICON_PATH: str = resource_path("assets/icons/app_icon.png")
+
 
 def set_app_icon_path(new_path: str) -> None:
     """
